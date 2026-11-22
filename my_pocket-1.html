@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>MY POCKET</title>
+<style>
+:root{--bg:#0b1220;--panel:#131f31;--panel2:#1a2940;--text:#f4f7fb;--muted:#9baac0;--green:#42d392;--red:#ff7b86;--line:#26364d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+main{max-width:760px;margin:auto;padding:24px 16px 100px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.brand{font-size:21px;font-weight:850;letter-spacing:.5px}.brand span{color:var(--green)}.tag{font-size:12px;color:var(--muted)}
+h1{font-size:25px;margin:8px 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:19px;margin:14px 0}
+.label{font-size:13px;color:var(--muted)}.amount{font-size:34px;font-weight:800;letter-spacing:-1px;margin:8px 0 15px}
+.progress{height:10px;background:#29384e;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:var(--green);border-radius:20px;transition:width .25s}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.small{font-size:12px;color:var(--muted);margin-top:9px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:var(--panel2);padding:15px;border-radius:15px}.stat b{display:block;font-size:20px;margin-top:7px}.income{color:var(--green)}.expense{color:var(--red)}
+h2{font-size:17px;margin:0 0 14px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{border:0;border-radius:13px;padding:13px 15px;font-weight:750;font-size:14px;cursor:pointer;background:var(--green);color:#092016}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+button.danger{background:#3b202c;color:#ffb5bd}.list{display:flex;flex-direction:column;gap:9px}.item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--panel2);border-radius:13px}.item small{display:block;color:var(--muted);margin-top:4px}.item .right{display:flex;align-items:center;gap:9px}.del{padding:7px 9px;font-size:12px;background:#344258;color:#fff}
+input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#0d1727;color:var(--text);font:inherit;margin:6px 0 13px}label{font-size:13px;color:var(--muted)}.formrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.empty{color:var(--muted);text-align:center;padding:20px 8px;font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:25px}
+@media(min-width:600px){main{padding-top:34px}.amount{font-size:40px}}
+</style>
+</head>
+<body>
+<main>
+ <div class="top"><div class="brand">MY <span>POCKET</span></div><div class="tag">나의 저축 기록</div></div>
+ <h1>내 돈 관리하기</h1><p class="sub">작은 기록이 목표에 가까워지는 첫걸음이에요.</p>
+ <section class="card">
+  <div class="label">현재 모은 금액</div><div class="amount" id="saved">₩0</div>
+  <div class="row label"><span id="goalLabel">목표 ₩1,000,000</span><b id="percent">0%</b></div>
+  <div class="progress" style="margin-top:9px"><div class="bar" id="bar"></div></div>
+  <div class="small" id="remaining">목표까지 ₩1,000,000 남았어요.</div>
+ </section>
+ <section class="stats">
+  <div class="stat"><div class="label">총 수입</div><b class="income" id="income">₩0</b></div>
+  <div class="stat"><div class="label">총 지출</div><b class="expense" id="expense">₩0</b></div>
+ </section>
+ <section class="card">
+  <h2>빠른 기록</h2>
+  <div class="actions"><button onclick="openForm('수입')">＋ 수입 추가</button><button class="secondary" onclick="openForm('지출')">－ 지출 추가</button></div>
+ </section>
+ <section class="card" id="formCard" hidden>
+  <h2 id="formTitle">수입 기록</h2>
+  <form id="txForm">
+   <label>내용</label><input id="memo" maxlength="40" placeholder="예: 용돈" required>
+   <div class="formrow"><div><label>금액 (원)</label><input id="amount" type="number" min="1" step="1" inputmode="numeric" placeholder="10000" required></div>
+   <div><label>종류</label><select id="type"><option>수입</option><option>지출</option></select></div></div>
+   <div class="actions"><button type="submit">기록 저장</button><button type="button" class="secondary" onclick="closeForm()">취소</button></div>
+  </form>
+ </section>
+ <section class="card">
+  <div class="row"><h2>저축 목표</h2><button class="secondary" onclick="editGoal()">목표 변경</button></div>
+  <div class="label">목표 금액 (원)</div><div class="amount" style="font-size:25px" id="goalBig">₩1,000,000</div>
+ </section>
+ <section class="card">
+  <h2>최근 기록</h2><div class="list" id="history"><div class="empty">아직 기록이 없어요. 첫 수입을 추가해 보세요!</div></div>
+ </section>
+ <footer>MY POCKET · 기록은 이 기기의 브라우저에 저장됩니다.<br>중요한 금융 계좌나 비밀번호는 입력하지 마세요.</footer>
+</main>
+<script>
+const KEY='mypocket_v1';
+let data={goal:1000000,items:[]};
+try{const old=JSON.parse(localStorage.getItem(KEY));if(old&&Array.isArray(old.items)&&Number.isFinite(old.goal))data=old}catch(e){}
+const won=n=>'₩'+Math.round(n).toLocaleString('ko-KR');
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function totals(){let inc=0,exp=0;for(const x of data.items){if(x.type==='수입')inc+=x.amount;else exp+=x.amount}return {inc,exp,saved:inc-exp}}
+function render(){
+ const t=totals(),pct=data.goal>0?Math.max(0,Math.min(100,t.saved/data.goal*100)):0;
+ document.getElementById('saved').textContent=won(t.saved);
+ document.getElementById('income').textContent=won(t.inc);
+ document.getElementById('expense').textContent=won(t.exp);
+ document.getElementById('goalLabel').textContent='목표 '+won(data.goal);
+ document.getElementById('goalBig').textContent=won(data.goal);
+ document.getElementById('percent').textContent=Math.floor(pct)+'%';
+ document.getElementById('bar').style.width=pct+'%';
+ document.getElementById('remaining').textContent=t.saved>=data.goal?'목표를 달성했어요! 🎉':'목표까지 '+won(data.goal-t.saved)+' 남았어요.';
+ const h=document.getElementById('history');h.innerHTML='';
+ if(!data.items.length){h.innerHTML='<div class="empty">아직 기록이 없어요. 첫 수입을 추가해 보세요!</div>';return}
+ [...data.items].reverse().slice(0,30).forEach(x=>{
+  const el=document.createElement('div');el.className='item';
+  const left=document.createElement('div'),name=document.createElement('strong'),date=document.createElement('small');
+  name.textContent=x.memo;date.textContent=x.date+' · '+x.type;left.append(name,date);
+  const right=document.createElement('div');right.className='right';
+  const val=document.createElement('b');val.className=x.type==='수입'?'income':'expense';val.textContent=(x.type==='수입'?'+':'−')+won(x.amount);
+  const del=document.createElement('button');del.className='del';del.textContent='삭제';del.onclick=()=>{if(confirm('이 기록을 삭제할까요?')){data.items=data.items.filter(y=>y.id!==x.id);save()}};
+  right.append(val,del);el.append(left,right);h.append(el);
+ });
+}
+function openForm(type){document.getElementById('type').value=type;document.getElementById('formTitle').textContent=type+' 기록';document.getElementById('formCard').hidden=false;document.getElementById('memo').focus()}
+function closeForm(){document.getElementById('formCard').hidden=true;document.getElementById('txForm').reset()}
+document.getElementById('txForm').addEventListener('submit',e=>{
+ e.preventDefault();const memo=document.getElementById('memo').value.trim(),amount=Number(document.getElementById('amount').value),type=document.getElementById('type').value;
+ if(!memo||!Number.isSafeInteger(amount)||amount<=0){alert('내용과 올바른 금액을 입력해 주세요.');return}
+ data.items.push({id:Date.now()+Math.random(),memo,amount,type,date:new Date().toLocaleDateString('ko-KR')});save();closeForm();
+});
+function editGoal(){const v=prompt('새 저축 목표 금액을 원 단위로 입력해 주세요.',String(data.goal));if(v===null)return;const n=Number(v);if(!Number.isSafeInteger(n)||n<=0){alert('1원 이상의 정수로 입력해 주세요.');return}data.goal=n;save()}
+render();
+</script>
+</body>
+</html>
